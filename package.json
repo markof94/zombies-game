@@ -5,6 +5,7 @@
     "build": "parcel build src/index.html"
   },
   "dependencies": {
+    "@pixi/math-extras": "^6.1.2",
     "pixi.js": "^6.0.4"
   },
   "devDependencies": {
