@@ -1,9 +1,9 @@
 import { Point, Sprite } from "pixi.js";
-import { Manager } from "../Manager";
 import { Keyboard } from "../Utilities/Keyboard";
 import { Entity } from "./Entity";
-import Normalize from "../Utilities/Vector/Normalize";
+import normalize from "../Utilities/Vector/normalize";
 import { Smooth } from "../Utilities/Smooth";
+import { tileSize } from "../Utilities/constants";
 
 export class Player extends Entity {
   public sprite: Sprite;
@@ -36,10 +36,13 @@ export class Player extends Entity {
 
     this.movementAxis.x = xAxis;
     this.movementAxis.y = yAxis;
-    this.movementAxis = Normalize(this.movementAxis);
+    this.movementAxis = normalize(this.movementAxis);
 
     this.velocity.x = Smooth(this.velocity.x, this.movementAxis.x * this.maxSpeed, 8);
     this.velocity.y = Smooth(this.velocity.y, this.movementAxis.y * this.maxSpeed, 8);
+
+    this.sprite.width = tileSize;
+    this.sprite.height = tileSize;
 
   }
 };

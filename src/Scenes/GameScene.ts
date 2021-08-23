@@ -1,10 +1,11 @@
-import { Container, Graphics, InteractionEvent, Point, Rectangle, Sprite } from "pixi.js";
-import { Bullet } from "../Entities/Bullet";
+import { Container, Graphics, InteractionEvent, Point } from "pixi.js";
 import { Entity } from "../Entities/Entity";
 import { Player } from "../Entities/Player";
+import createBullet from "../GameActions/createBullet";
 import { IScene, Manager } from "../Manager";
-import Normalize from "../Utilities/Vector/Normalize";
-import Subtract from "../Utilities/Vector/Subtract";
+import level from '../Levels/level.json';
+import { tileSize } from "../Utilities/constants";
+import { Wall } from "../Entities/Wall";
 
 export class GameScene extends Container implements IScene {
   private player: Player;
@@ -14,16 +15,8 @@ export class GameScene extends Container implements IScene {
     super();
 
     this.addBackground();
-
-    this.player = new Player(Manager.width / 2, Manager.height / 2, 'player');
-    this.addEntity(this.player);
-
+    this.generateLevel();
     this.setUpTapListener();
-  }
-
-  private setUpTapListener(): void {
-    this.on('pointerdown', this.handleTap, this);
-    this.interactive = true;
   }
 
   private addBackground(): void {
@@ -33,15 +26,52 @@ export class GameScene extends Container implements IScene {
     this.addChild(graphics);
   }
 
-  private handleTap(e: InteractionEvent): void {
-    const tapPoint = e.data.global;
-    this.shootBullet(tapPoint);
+  private generateLevel(): void {
+    const { structure } = level;
+
+    for (let i = 0; i < structure.length; i++) {
+      for (let j = 0; j < structure[i].length; j++) {
+        const element = structure[i][j];
+        const x = j * tileSize + tileSize / 2;
+        const y = i * tileSize + tileSize / 2;
+
+        switch (element) {
+          case 1:
+            this.createPlayer(x, y);
+            break;
+          case 2:
+            this.createWall(x, y);
+            break;
+
+          default:
+            break;
+        }
+      }
+    }
   }
 
-  public shootBullet(target: Point): void {
-    const directionVector = Normalize(Subtract(new Point(target.x, target.y), this.player.sprite.position));
-    const { x, y } = this.player.sprite.position;
-    const bullet = new Bullet(x, y, 'player', { direction: directionVector });
+  private createPlayer(x: number, y: number): void {
+    this.player = new Player(x, y, 'player');
+    this.addEntity(this.player);
+  }
+
+  private createWall(x: number, y: number): void {
+    const wall = new Wall(x, y, 'wall');
+    this.addEntity(wall);
+  }
+
+  private setUpTapListener(): void {
+    this.on('pointerdown', this.handleTap, this);
+    this.interactive = true;
+  }
+
+  private handleTap(e: InteractionEvent): void {
+    const tapPoint = e.data.global;
+    this.shootBullet(this.player.sprite.position, tapPoint);
+  }
+
+  public shootBullet(originPosition: any, targetPosition: any): void {
+    const bullet = createBullet(originPosition, targetPosition);
     this.addEntity(bullet);
   }
 

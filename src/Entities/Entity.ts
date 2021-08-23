@@ -1,5 +1,6 @@
 import { Container, Point, Sprite } from "pixi.js";
 import { Manager } from "../Manager";
+import { tileSize } from "../Utilities/constants";
 
 export class Entity extends Container {
   public sprite: Sprite;
@@ -17,6 +18,8 @@ export class Entity extends Container {
       this.sprite.anchor.set(0.5);
       this.sprite.x = x;
       this.sprite.y = y;
+      this.sprite.width = tileSize;
+      this.sprite.height = tileSize;
     }
   }
 
