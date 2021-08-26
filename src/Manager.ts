@@ -1,6 +1,6 @@
 import { Application } from "@pixi/app";
 import { DisplayObject } from "@pixi/display";
-import { InteractionEvent, Loader, SCALE_MODES, settings } from "pixi.js";
+import { InteractionEvent, Loader, Point, SCALE_MODES, settings } from "pixi.js";
 import { Keyboard } from "./Utilities/Keyboard";
 
 export class Manager {
@@ -65,6 +65,10 @@ export class Manager {
 
   public static getLoader(): Loader {
     return Manager.app.loader;
+  }
+
+  public static cursorPosition(): Point{
+    return Manager.app.renderer.plugins.interaction.mouse.global;
   }
 
   private static update(deltaMS): void {

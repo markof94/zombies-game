@@ -6,6 +6,8 @@ import { Smooth } from "../Utilities/Smooth";
 import { TAG_PLAYER, TAG_WALL, tileSize } from "../Utilities/constants";
 import magnitude from "../Utilities/Vector/magnitude";
 import { Manager } from "../Manager";
+import getAngle from "../Utilities/Vector/getAngle";
+import subtract from "../Utilities/Vector/subtract";
 
 export class Player extends Entity {
   public movementAxis: Point;
@@ -65,14 +67,17 @@ export class Player extends Entity {
   }
 
   private assignAppropriateAnimations(): void {
-    if (this.movementAxis.x > 0) {
+    const cursorPosition = Manager.cursorPosition();
+    const angle = getAngle(subtract(cursorPosition, this.collisionSprite.position));
+
+    if ((angle >= 0 && angle < 45) || (angle >= 315 && angle < 360)) {
       this.setAnimationSheetByName('playerRight');
-    } else if (this.movementAxis.x < 0) {
-      this.setAnimationSheetByName('playerLeft');
-    } else if (this.movementAxis.y < 0) {
-      this.setAnimationSheetByName('playerUp');
-    } else if (this.movementAxis.y > 0) {
+    } else if (angle >= 45 && angle < 135) {
       this.setAnimationSheetByName('playerDown');
+    } else if (angle >= 135 && angle < 225) {
+      this.setAnimationSheetByName('playerLeft');
+    } else {
+      this.setAnimationSheetByName('playerUp');
     }
   }
 
