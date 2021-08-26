@@ -1,6 +1,6 @@
 import { Application } from "@pixi/app";
 import { DisplayObject } from "@pixi/display";
-import { InteractionEvent } from "pixi.js";
+import { InteractionEvent, SCALE_MODES, settings } from "pixi.js";
 import { Keyboard } from "./Utilities/Keyboard";
 
 export class Manager {
@@ -33,6 +33,9 @@ export class Manager {
       height: height
     });
 
+    settings.SCALE_MODE = SCALE_MODES.NEAREST;
+    Manager.app.ticker.maxFPS = 60;
+
     Keyboard.initialize();
 
     Manager.app.ticker.add(Manager.update)
@@ -54,6 +57,10 @@ export class Manager {
 
   public static deltaTime(): number {
     return (1.0 / Manager.app.ticker.deltaMS);
+  }
+
+  public static getFPS(): number {
+    return Manager.app.ticker.maxFPS;
   }
 
   private static update(deltaMS): void {
