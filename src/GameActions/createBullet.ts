@@ -8,7 +8,7 @@ const createBullet = (originPosition: any, targetPosition: any, data: any): Bull
   const directionFromPlayer = normalize(subtract(targetPoint, originPosition));
 
   const { x, y } = originPosition;
-  const bullet = new Bullet(x, y, 'bullet', { direction: directionFromPlayer, ...data });
+  const bullet = new Bullet({ x, y, direction: directionFromPlayer, ...data });
   return bullet;
 }
 

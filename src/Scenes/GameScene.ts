@@ -53,12 +53,12 @@ export class GameScene extends Container implements IScene {
   }
 
   private createPlayer(x: number, y: number): void {
-    this.player = new Player(x, y, 'player', {});
+    this.player = new Player({ x, y });
     this.addEntity(this.player);
   }
 
   private createWall(x: number, y: number): void {
-    const wall = new Wall(x, y, 'wall', {});
+    const wall = new Wall({ x, y });
     this.addEntity(wall);
   }
 

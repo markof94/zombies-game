@@ -1,6 +1,6 @@
 import { Application } from "@pixi/app";
 import { DisplayObject } from "@pixi/display";
-import { InteractionEvent, SCALE_MODES, settings } from "pixi.js";
+import { InteractionEvent, Loader, SCALE_MODES, settings } from "pixi.js";
 import { Keyboard } from "./Utilities/Keyboard";
 
 export class Manager {
@@ -61,6 +61,10 @@ export class Manager {
 
   public static getFPS(): number {
     return Manager.app.ticker.maxFPS;
+  }
+
+  public static getLoader(): Loader {
+    return Manager.app.loader;
   }
 
   private static update(deltaMS): void {

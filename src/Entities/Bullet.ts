@@ -10,8 +10,8 @@ export class Bullet extends Entity {
   public owner: Entity;
   public expireTimer: number = 2;
 
-  constructor(x: number, y: number, texture: string = 'logo', data: any = {}) {
-    super(x, y, texture, data);
+  constructor(data: any = {}) {
+    super({ ...data, texture: 'bullet' });
 
     this.collisionMask = ['bullet', 'player'];
     this.collisionSprite.width = tileSize / 6;

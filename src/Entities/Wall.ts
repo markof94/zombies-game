@@ -5,8 +5,8 @@ import { Entity } from "./Entity";
 export class Wall extends Entity {
   public sprite: Sprite;
 
-  constructor(x: number, y: number, texture: string = 'logo', data: any) {
-    super(x, y, texture, data);
+  constructor(data: any) {
+    super({ ...data, texture: 'wall' });
     this.tag = TAG_WALL;
   }
 

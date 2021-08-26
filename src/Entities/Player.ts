@@ -5,14 +5,22 @@ import normalize from "../Utilities/Vector/normalize";
 import { Smooth } from "../Utilities/Smooth";
 import { TAG_PLAYER, TAG_WALL, tileSize } from "../Utilities/constants";
 import magnitude from "../Utilities/Vector/magnitude";
+import { Manager } from "../Manager";
 
 export class Player extends Entity {
-  public sprite: Sprite;
   public movementAxis: Point;
   public maxSpeed: number = 50;
 
-  constructor(x: number, y: number, texture: string = 'logo', data: any = {}) {
-    super(x, y, texture, data);
+  constructor(data: any = {}) {
+    super({
+      ...data,
+      sheets: [
+        'playerUp',
+        'playerDown',
+        'playerLeft',
+        'playerRight',
+      ]
+    });
     this.movementAxis = new Point(0, 0);
 
     this.setupCollision();
@@ -29,6 +37,7 @@ export class Player extends Entity {
   public update(): void {
     super.update();
     this.handleControls();
+    this.assignAppropriateAnimations();
   }
 
   private handleControls(): void {
@@ -52,6 +61,19 @@ export class Player extends Entity {
     this.velocity.x = Smooth(this.velocity.x, this.movementAxis.x * this.maxSpeed, 3);
     this.velocity.y = Smooth(this.velocity.y, this.movementAxis.y * this.maxSpeed, 3);
 
+    this.sprite.animationSpeed = magnitude(this.velocity) * 0.05 * Manager.deltaTime();
+  }
+
+  private assignAppropriateAnimations(): void {
+    if (this.movementAxis.x > 0) {
+      this.setAnimationSheetByName('playerRight');
+    } else if (this.movementAxis.x < 0) {
+      this.setAnimationSheetByName('playerLeft');
+    } else if (this.movementAxis.y < 0) {
+      this.setAnimationSheetByName('playerUp');
+    } else if (this.movementAxis.y > 0) {
+      this.setAnimationSheetByName('playerDown');
+    }
   }
 
   public checkCollision(other: Entity): void {

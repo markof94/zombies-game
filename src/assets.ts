@@ -3,4 +3,8 @@ export const assets = [
   { name: "player", url: "assets/player.png" },
   { name: "bullet", url: "assets/bullet.png" },
   { name: "wall", url: "assets/wall.png" },
+  { name: "playerUp", url: "assets/Textures/Player/playerUp.json" },
+  { name: "playerDown", url: "assets/Textures/Player/playerDown.json" },
+  { name: "playerLeft", url: "assets/Textures/Player/playerLeft.json" },
+  { name: "playerRight", url: "assets/Textures/Player/playerRight.json" },
 ];
