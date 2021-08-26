@@ -11,6 +11,6 @@ export class Wall extends Entity {
   }
 
   public update(): void {
-    super.update();
+    // super.update();
   }
 };

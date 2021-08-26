@@ -4,9 +4,8 @@ import { Player } from "../Entities/Player";
 import createBullet from "../GameActions/createBullet";
 import { IScene, Manager } from "../Manager";
 import level from '../Levels/level.json';
-import { TAG_PLAYER, tileSize } from "../Utilities/constants";
+import { tileSize } from "../Utilities/constants";
 import { Wall } from "../Entities/Wall";
-import boxCollision from "../Utilities/Collision/boxCollision";
 import canEntitiesCollide from "../Utilities/Collision/canEntitiesCollide";
 
 export class GameScene extends Container implements IScene {
@@ -26,6 +25,7 @@ export class GameScene extends Container implements IScene {
     graphics.beginFill(0x757575);
     graphics.drawRect(0, 0, Manager.width, Manager.height);
     this.addChild(graphics);
+    this.sortableChildren = true;
   }
 
   private generateLevel(): void {

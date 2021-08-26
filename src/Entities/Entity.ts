@@ -98,6 +98,8 @@ export class Entity extends Container {
     this.sprite.x = this.collisionSprite.x;
     this.sprite.y = this.collisionSprite.y;
     this.sprite.angle = this.collisionSprite.angle;
+
+    this.sprite.zIndex = this.sprite.y;
   }
 
   public checkCollision(other: Entity): void {

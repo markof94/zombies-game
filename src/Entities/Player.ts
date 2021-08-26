@@ -40,6 +40,7 @@ export class Player extends Entity {
     super.update();
     this.handleControls();
     this.assignAppropriateAnimations();
+    this.sprite.zIndex = this.sprite.y + this.sprite.height;
   }
 
   private handleControls(): void {
@@ -63,7 +64,8 @@ export class Player extends Entity {
     this.velocity.x = Smooth(this.velocity.x, this.movementAxis.x * this.maxSpeed, 3);
     this.velocity.y = Smooth(this.velocity.y, this.movementAxis.y * this.maxSpeed, 3);
 
-    this.sprite.animationSpeed = magnitude(this.velocity) * 0.05 * Manager.deltaTime();
+    const animSpeed = magnitude(this.velocity) * 0.05 * Manager.deltaTime();
+    this.sprite.animationSpeed = animSpeed;
   }
 
   private assignAppropriateAnimations(): void {
