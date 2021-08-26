@@ -7,4 +7,6 @@ export const assets = [
   { name: "playerDown", url: "assets/Textures/Player/playerDown.json" },
   { name: "playerLeft", url: "assets/Textures/Player/playerLeft.json" },
   { name: "playerRight", url: "assets/Textures/Player/playerRight.json" },
+  { name: "doorOpen", url: "assets/doorOpen.png" },
+  { name: "doorClosed", url: "assets/doorClosed.png" },
 ];

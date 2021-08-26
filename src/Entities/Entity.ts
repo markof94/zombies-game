@@ -1,10 +1,10 @@
-import { AnimatedSprite, Container, Point, Sprite, Texture } from "pixi.js";
+import { AnimatedSprite, Container, Filter, filters, Point, Sprite, Texture } from "pixi.js";
 import { Manager } from "../Manager";
 import boxCollision from "../Utilities/Collision/boxCollision";
 import { tileSize } from "../Utilities/constants";
 import getTexturesFromAnimation from "../Utilities/getTexturesFromAnimation";
 
-export class Entity extends Container {
+export class Entity {
   public sprite: any;
   public collisionSprite: Sprite;
   public velocity: Point;
@@ -15,15 +15,17 @@ export class Entity extends Container {
   public collisionBounds: any;
   public animations: any[] = [];
   public currentAnimationSheet: string;
+  public ignoreCollision: boolean = false;
+
+  public interactable: boolean = false;
+  public shouldShowInteractIndicator: boolean = false;
+  public interactIndicatorFilter: any = null;
+  public filterCount: number = 0;
 
   constructor(data: any = {}) {
-    super();
-
     const {
       x,
       y,
-      texture,
-      sheets,
     } = data;
 
     this.velocity = new Point(0, 0);
@@ -41,6 +43,8 @@ export class Entity extends Container {
 
     Object.assign(this.sprite, { entity: this });
     Object.assign(this, data);
+
+    this.interactIndicatorFilter = new filters.ColorMatrixFilter();
   }
 
   public createSprite(data): void {
@@ -88,6 +92,7 @@ export class Entity extends Container {
 
   public update(): void {
     this.updateMovement();
+    this.updateInteractFilter();
   }
 
   private updateMovement(): void {
@@ -103,6 +108,7 @@ export class Entity extends Container {
   }
 
   public checkCollision(other: Entity): void {
+    if (this.ignoreCollision || other.ignoreCollision) return;
     if (boxCollision(this.collisionSprite, other.collisionSprite)) {
       this.onCollision(other);
     }
@@ -112,7 +118,33 @@ export class Entity extends Container {
     // 
   }
 
+  public onInteract(): void {
+
+  }
+
   public getRemoved(): void {
     this.shouldBeRemoved = true;
+  }
+
+  public onEnterInteractRange(): void {
+    if (this.shouldShowInteractIndicator) return;
+
+    this.shouldShowInteractIndicator = true;
+    this.sprite.filters = [this.interactIndicatorFilter];
+  }
+
+  public onLeaveInteractRange(): void {
+    if (!this.shouldShowInteractIndicator) return;
+
+    this.shouldShowInteractIndicator = false;
+    this.sprite.filters = [];
+  }
+
+  // Glowing effect
+  private updateInteractFilter(): void {
+    if (!this.shouldShowInteractIndicator) return;
+    const val = Math.sin(this.filterCount) * 0.3;
+    this.interactIndicatorFilter.brightness(val + Math.PI / 3, false);
+    this.filterCount += Manager.deltaTime();
   }
 };

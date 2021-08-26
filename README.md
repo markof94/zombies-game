@@ -1,1 +1,1 @@
-Playing around with Pixi.js
+Playing around with Pixi.js and learning TypeScript

@@ -7,17 +7,21 @@ import level from '../Levels/level.json';
 import { tileSize } from "../Utilities/constants";
 import { Wall } from "../Entities/Wall";
 import canEntitiesCollide from "../Utilities/Collision/canEntitiesCollide";
+import { Door } from "../Entities/Door";
+import getInteractablesInRange from "../GameActions/getInteractablesInRange";
 
 export class GameScene extends Container implements IScene {
   private player: Player;
   private entities: Entity[] = [];
+  private interactablesInRange: Entity[] = [];
+  private activeInteractable: Entity = null;
 
   constructor() {
     super();
 
     this.addBackground();
     this.generateLevel();
-    this.setUpTapListener();
+    this.setupControls();
   }
 
   private addBackground(): void {
@@ -44,6 +48,8 @@ export class GameScene extends Container implements IScene {
           case 2:
             this.createWall(x, y);
             break;
+          case 3:
+            this.createDoor(x, y);
 
           default:
             break;
@@ -62,9 +68,22 @@ export class GameScene extends Container implements IScene {
     this.addEntity(wall);
   }
 
-  private setUpTapListener(): void {
+  private createDoor(x: number, y: number): void {
+    const door = new Door({ x, y });
+    this.addEntity(door);
+  }
+
+  private setupControls(): void {
     this.on('pointerdown', this.handleTap, this);
+    document.addEventListener('keydown', (e) => this.onKeyDown(e));
     this.interactive = true;
+  }
+
+  private onKeyDown(event: KeyboardEvent): void {
+    const { code } = event;
+    if (code === 'KeyE') {
+      if (this.activeInteractable) this.activeInteractable.onInteract();
+    }
   }
 
   private handleTap(e: InteractionEvent): void {
@@ -78,12 +97,21 @@ export class GameScene extends Container implements IScene {
   }
 
   public update(deltaMS: number): void {
+    this.updateEntities();
+    this.checkForExpiredEntities();
+    this.updateListOfInteractablesInRange();
+  }
+
+  private updateEntities(): void {
     this.entities.forEach((entity) => {
       entity.update();
       this.checkCollisionsFor(entity);
+      if (this.activeInteractable === entity) {
+        entity.onEnterInteractRange();
+      } else {
+        entity.onLeaveInteractRange();
+      }
     });
-
-    this.checkForExpiredEntities();
   }
 
   public checkCollisionsFor(entity: Entity): void {
@@ -95,17 +123,27 @@ export class GameScene extends Container implements IScene {
     });
   }
 
-  private addEntity(entity: Entity) {
+  private addEntity(entity: Entity): void {
     this.entities.push(entity);
     this.addChild(entity.sprite);
   }
 
-  private checkForExpiredEntities() {
+  private checkForExpiredEntities(): void {
     for (let i = this.entities.length - 1; i >= 0; i--) {
       if (this.entities[i].shouldBeRemoved) {
         this.removeChild(this.entities[i].sprite);
         this.entities.splice(i, 1);
       }
     }
+  }
+
+  private updateListOfInteractablesInRange(): void {
+    this.interactablesInRange = getInteractablesInRange(this.player, this.entities);
+    if (this.interactablesInRange.length > 0) {
+      this.activeInteractable = this.interactablesInRange[0];
+    } else {
+      this.activeInteractable = null;
+    }
+
   }
 }
