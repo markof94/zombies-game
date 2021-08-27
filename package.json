@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "@pixi/math-extras": "^6.1.2",
+    "easystarjs": "^0.4.4",
     "pixi.js": "^6.0.4"
   },
   "devDependencies": {

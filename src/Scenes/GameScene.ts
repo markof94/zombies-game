@@ -9,12 +9,16 @@ import { Wall } from "../Entities/Wall";
 import canEntitiesCollide from "../Utilities/Collision/canEntitiesCollide";
 import { Door } from "../Entities/Door";
 import getInteractablesInRange from "../GameActions/getInteractablesInRange";
+import { EnemySpawner } from "../Misc/EnemySpawner";
+import { roundToNearest } from "../Utilities/roundToNearest";
 
 export class GameScene extends Container implements IScene {
   private player: Player;
   private entities: Entity[] = [];
   private interactablesInRange: Entity[] = [];
   private activeInteractable: Entity = null;
+  private spawners: EnemySpawner[] = [];
+  public static pathGrid: number[][] = [[]];
 
   constructor() {
     super();
@@ -32,7 +36,7 @@ export class GameScene extends Container implements IScene {
     this.sortableChildren = true;
   }
 
-  private generateLevel(): void {
+  public generateLevel(): void {
     const { structure } = level;
 
     for (let i = 0; i < structure.length; i++) {
@@ -47,9 +51,15 @@ export class GameScene extends Container implements IScene {
             break;
           case 2:
             this.createWall(x, y);
+            GameScene.blockPathCell(x, y);
             break;
           case 3:
             this.createDoor(x, y);
+            GameScene.blockPathCell(x, y);
+            break;
+          case 4:
+            this.createEnemySpawner(x, y);
+            break;
 
           default:
             break;
@@ -71,6 +81,11 @@ export class GameScene extends Container implements IScene {
   private createDoor(x: number, y: number): void {
     const door = new Door({ x, y });
     this.addEntity(door);
+  }
+
+  private createEnemySpawner(x: number, y: number): void {
+    const spawner = new EnemySpawner(x, y, this);
+    this.spawners.push(spawner);
   }
 
   private setupControls(): void {
@@ -123,7 +138,7 @@ export class GameScene extends Container implements IScene {
     });
   }
 
-  private addEntity(entity: Entity): void {
+  public addEntity(entity: Entity): void {
     this.entities.push(entity);
     this.addChild(entity.sprite);
   }
@@ -144,6 +159,28 @@ export class GameScene extends Container implements IScene {
     } else {
       this.activeInteractable = null;
     }
+  }
 
+  public static resetPathGrid(): void {
+    const { structure } = level;
+    GameScene.pathGrid = Array(structure.length).fill(0).map(x => Array(structure[0].length).fill(0));
+  }
+
+  public static updatePathGrid(x: number, y: number, solid: boolean): void {
+    console.log('value: ', GameScene.pathGrid);
+    const i = roundToNearest(y, tileSize) / tileSize;
+    const j = roundToNearest(x, tileSize) / tileSize;
+    console.log(x, y);
+    GameScene.pathGrid[i][j] = solid ? 1 : 0;
+  }
+
+  public static blockPathCell(x: number, y: number): void {
+    GameScene.updatePathGrid(x, y, true);
+  }
+
+  public static unblockPathCell(x: number, y: number): void {
+    GameScene.updatePathGrid(x, y, false);
   }
 }
+
+GameScene.resetPathGrid();

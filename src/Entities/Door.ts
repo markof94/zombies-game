@@ -1,4 +1,5 @@
 import { Point, Sprite, Texture } from "pixi.js";
+import { GameScene } from "../Scenes/GameScene";
 import { TAG_WALL, tileSize } from "../Utilities/constants";
 import { Entity } from "./Entity";
 
@@ -12,9 +13,6 @@ export class Door extends Entity {
     super({ ...data, texture: 'doorClosed' });
     this.tag = TAG_WALL;
 
-    this.collisionSprite.height = tileSize / 2;
-    this.collisionSprite.anchor.set(0.5, 0);
-
     this.textureOpen = Texture.from('doorOpen');
     this.textureClosed = Texture.from('doorClosed');
     this.interactable = true;
@@ -24,12 +22,14 @@ export class Door extends Entity {
     this.isOpen = true;
     this.ignoreCollision = true;
     this.sprite.texture = this.textureOpen;
+    GameScene.unblockPathCell(this.sprite.x, this.sprite.y);
   }
 
   public close(): void {
     this.isOpen = false;
     this.ignoreCollision = false;
     this.sprite.texture = this.textureClosed;
+    GameScene.blockPathCell(this.sprite.x, this.sprite.y);
   }
 
   public update(): void {
