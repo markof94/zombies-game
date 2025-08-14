@@ -1,28 +1,30 @@
-import { Container, Graphics, Loader } from "pixi.js";
+import { Container, Graphics, Assets, Texture } from "pixi.js";
 import { assets } from "../assets";
 import { IScene, Manager } from "../Manager";
 import { GameScene } from "./GameScene";
 
 export class LoaderScene extends Container implements IScene {
-
   // for making our loader graphics...
   private loaderBar: Container;
   private loaderBarBoder: Graphics;
   private loaderBarFill: Graphics;
+  
+  // Store loaded assets
+  private loadedAssets: Map<string, Texture> = new Map();
+
   constructor() {
     super();
 
     const loaderBarWidth = Manager.width * 0.8;
 
     this.loaderBarFill = new Graphics();
-    this.loaderBarFill.beginFill(0x008800, 1)
-    this.loaderBarFill.drawRect(0, 0, loaderBarWidth, 50);
-    this.loaderBarFill.endFill();
+    this.loaderBarFill.fill({ color: 0x008800, alpha: 1 });
+    this.loaderBarFill.rect(0, 0, loaderBarWidth, 50);
     this.loaderBarFill.scale.x = 0;
 
     this.loaderBarBoder = new Graphics();
-    this.loaderBarBoder.lineStyle(10, 0x0, 1);
-    this.loaderBarBoder.drawRect(0, 0, loaderBarWidth, 50);
+    this.loaderBarBoder.setStrokeStyle({ width: 10, color: 0x0, alpha: 1 });
+    this.loaderBarBoder.rect(0, 0, loaderBarWidth, 50);
 
     this.loaderBar = new Container();
     this.loaderBar.addChild(this.loaderBarFill);
@@ -31,17 +33,59 @@ export class LoaderScene extends Container implements IScene {
     this.loaderBar.position.y = (Manager.height - this.loaderBar.height) / 2;
     this.addChild(this.loaderBar);
 
-    Loader.shared.add(assets);
-
-    Loader.shared.onProgress.add(this.downloadProgress, this);
-    Loader.shared.onComplete.once(this.gameLoaded, this);
-
-    Loader.shared.load();
+    // Start loading assets
+    this.loadAssets();
   }
 
-  private downloadProgress(loader: Loader): void {
-    const progressRatio = loader.progress / 100;
-    this.loaderBarFill.scale.x = progressRatio;
+  private async loadAssets(): Promise<void> {
+    try {
+      let loadedCount = 0;
+      const totalAssets = assets.length;
+
+      console.log("Starting to load assets...");
+
+      // Load assets individually with progress tracking
+      for (const asset of assets) {
+        try {
+          console.log(`Loading ${asset.name} from ${asset.url}...`);
+          
+          // Load the asset using PixiJS v8 Assets system
+          const loadedAsset = await Assets.load(asset.url);
+          
+          if (loadedAsset) {
+            // Store the loaded asset in our map
+            this.loadedAssets.set(asset.name, loadedAsset);
+            console.log(`✓ Successfully loaded ${asset.name}`);
+          } else {
+            console.warn(`⚠ Failed to load ${asset.name} - no asset returned`);
+          }
+        } catch (error) {
+          console.error(`✗ Failed to load ${asset.name}:`, error);
+        }
+        
+        loadedCount++;
+        this.downloadProgress(loadedCount / totalAssets);
+      }
+
+      console.log("Asset loading complete!");
+      console.log("Loaded assets:", Array.from(this.loadedAssets.keys()));
+      console.log("Total loaded assets:", this.loadedAssets.size);
+      
+      // Store the loaded assets globally so other parts of the app can access them
+      (globalThis as any).__LOADED_ASSETS__ = this.loadedAssets;
+      
+      // Add a small delay to ensure assets are fully processed
+      setTimeout(() => {
+        console.log("Starting game scene...");
+        this.gameLoaded();
+      }, 100);
+    } catch (error) {
+      console.error("Failed to load assets:", error);
+    }
+  }
+
+  private downloadProgress(progress: number): void {
+    this.loaderBarFill.scale.x = progress;
   }
 
   private gameLoaded(): void {

@@ -1,13 +1,13 @@
 import { Point, Sprite } from "pixi.js";
 import { Keyboard } from "../Utilities/Keyboard";
 import { Entity } from "./Entity";
-import normalize from "../Utilities/Vector/normalize";
+import normalize from "../Utilities/Vector/Normalize";
 import { Smooth } from "../Utilities/Smooth";
 import { TAG_PLAYER, TAG_WALL, tileSize } from "../Utilities/constants";
 import magnitude from "../Utilities/Vector/magnitude";
 import { Manager } from "../Manager";
 import getAngle from "../Utilities/Vector/getAngle";
-import subtract from "../Utilities/Vector/subtract";
+import subtract from "../Utilities/Vector/Subtract";
 
 export class Player extends Entity {
   public movementAxis: Point;

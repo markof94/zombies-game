@@ -1,4 +1,4 @@
-import { Container, Graphics, InteractionEvent, Point } from "pixi.js";
+import { Container, Graphics, Point, FederatedPointerEvent } from "pixi.js";
 import { Entity } from "../Entities/Entity";
 import { Player } from "../Entities/Player";
 import createBullet from "../GameActions/createBullet";
@@ -16,7 +16,7 @@ export class GameScene extends Container implements IScene {
   private player: Player;
   private entities: Entity[] = [];
   private interactablesInRange: Entity[] = [];
-  private activeInteractable: Entity = null;
+  private activeInteractable: Entity | null = null;
   private spawners: EnemySpawner[] = [];
   public static pathGrid: number[][] = [[]];
 
@@ -30,8 +30,8 @@ export class GameScene extends Container implements IScene {
 
   private addBackground(): void {
     const graphics = new Graphics();
-    graphics.beginFill(0x757575);
-    graphics.drawRect(0, 0, Manager.width, Manager.height);
+    graphics.fill({ color: 0x757575, alpha: 1 });
+    graphics.rect(0, 0, Manager.width, Manager.height);
     this.addChild(graphics);
     this.sortableChildren = true;
   }
@@ -101,7 +101,7 @@ export class GameScene extends Container implements IScene {
     }
   }
 
-  private handleTap(e: InteractionEvent): void {
+  private handleTap(e: FederatedPointerEvent): void {
     const tapPoint = e.data.global;
     this.shootBullet(this.player.sprite.position, tapPoint);
   }

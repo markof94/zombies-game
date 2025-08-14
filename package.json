@@ -1,17 +1,25 @@
 {
   "license": "",
   "scripts": {
-    "start": "parcel serve src/index.html --open",
-    "build": "parcel build src/index.html"
+    "start": "parcel src/index.html --open",
+    "build": "parcel build src/index.html",
+    "dev": "parcel src/index.html --open --port 1234",
+    "serve": "parcel src/index.html --port 1234"
   },
   "dependencies": {
     "@pixi/math-extras": "^6.1.2",
     "easystarjs": "^0.4.4",
-    "pixi.js": "^6.0.4"
+    "pixi.js": "^8.11.0"
   },
   "devDependencies": {
-    "parcel-bundler": "^1.12.5",
-    "parcel-plugin-static-files-copy": "^2.6.0",
-    "typescript": "^4.3.2"
+    "parcel": "^2.12.0",
+    "typescript": "^4.3.2",
+    "url": "^0.11.4"
+  },
+  "targets": {
+    "default": {
+      "source": "src/index.html",
+      "distDir": "dist"
+    }
   }
 }

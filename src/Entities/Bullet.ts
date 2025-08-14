@@ -5,7 +5,6 @@ import getAngle from "../Utilities/Vector/getAngle";
 import { Entity } from "./Entity";
 
 export class Bullet extends Entity {
-  public sprite: Sprite;
   public moveSpeed: number = 600;
   public owner: Entity;
   public expireTimer: number = 2;

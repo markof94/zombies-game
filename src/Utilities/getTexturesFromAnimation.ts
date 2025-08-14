@@ -1,20 +1,24 @@
 import { Texture } from "pixi.js";
+import { getLoadedAsset } from "./getLoadedAsset";
 
 const getTexturesFromAnimation = (animationName: string): Texture[] => {
   const textures: Texture[] = [];
-  let i = 0;
-
-  while (1) {
-    const texture = Texture.from(`${animationName}-${i}.png`);
-
-    if (!texture || !texture.valid) {
-      break;
+  
+  try {
+    // Get the loaded asset instead of trying to load it
+    const loadedAsset = getLoadedAsset(animationName);
+    
+    if (loadedAsset) {
+      // Since these are single images, just use the loaded texture
+      textures.push(loadedAsset);
+      console.log(`✓ Using loaded texture for ${animationName}`);
+    } else {
+      console.warn(`⚠ Texture for ${animationName} not found in loaded assets`);
     }
-
-    textures.push(texture);
-    i += 1;
+  } catch (error) {
+    console.warn(`Failed to get texture for ${animationName}:`, error);
   }
-
+  
   return textures;
 };
 

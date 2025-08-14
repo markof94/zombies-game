@@ -1,8 +1,9 @@
-import { AnimatedSprite, Container, Filter, filters, Point, Sprite, Texture } from "pixi.js";
+import { AnimatedSprite, Container, Filter, Point, Sprite, Texture, ColorMatrixFilter } from "pixi.js";
 import { Manager } from "../Manager";
 import boxCollision from "../Utilities/Collision/boxCollision";
 import { tileSize } from "../Utilities/constants";
 import getTexturesFromAnimation from "../Utilities/getTexturesFromAnimation";
+import { getLoadedAsset } from "../Utilities/getLoadedAsset";
 
 export class Entity {
   public sprite: any;
@@ -19,7 +20,7 @@ export class Entity {
 
   public interactable: boolean = false;
   public shouldShowInteractIndicator: boolean = false;
-  public interactIndicatorFilter: any = null;
+  public interactIndicatorFilter: ColorMatrixFilter | null = null;
   public filterCount: number = 0;
 
   constructor(data: any = {}) {
@@ -44,7 +45,7 @@ export class Entity {
     Object.assign(this.sprite, { entity: this });
     Object.assign(this, data);
 
-    this.interactIndicatorFilter = new filters.ColorMatrixFilter();
+    this.interactIndicatorFilter = new ColorMatrixFilter();
   }
 
   public createSprite(data): void {
@@ -55,11 +56,33 @@ export class Entity {
 
     if (sheets && sheets.length > 0) {
       this.createAnimations(sheets);
-      this.sprite = new AnimatedSprite(this.animations[0].textures);
-      this.sprite.animationSpeed = 0;
-      this.sprite.play();
+      
+      // Check if we have valid textures before creating AnimatedSprite
+      if (this.animations.length > 0 && this.animations[0].textures.length > 0) {
+        this.sprite = new AnimatedSprite(this.animations[0].textures);
+        this.sprite.animationSpeed = 0;
+        this.sprite.play();
+      } else {
+        // Fall back to a default sprite if no textures are available
+        const defaultTexture = getLoadedAsset('player');
+        if (defaultTexture) {
+          this.sprite = new Sprite(defaultTexture);
+        } else {
+          // Create a placeholder sprite if no texture is available
+          this.sprite = new Sprite();
+          console.warn("No default texture available, using placeholder sprite");
+        }
+      }
     } else {
-      this.sprite = Sprite.from(texture);
+      // Use the loaded asset instead of trying to load by name
+      const loadedTexture = getLoadedAsset(texture);
+      if (loadedTexture) {
+        this.sprite = new Sprite(loadedTexture);
+      } else {
+        // Create a placeholder sprite if texture not found
+        this.sprite = new Sprite();
+        console.warn(`Texture "${texture}" not found, using placeholder sprite`);
+      }
     }
   }
 
@@ -142,8 +165,9 @@ export class Entity {
 
   // Glowing effect
   private updateInteractFilter(): void {
-    if (!this.shouldShowInteractIndicator) return;
+    if (!this.shouldShowInteractIndicator || !this.interactIndicatorFilter) return;
     const val = Math.sin(this.filterCount) * 0.3;
+    // Updated to use the new ColorMatrixFilter API
     this.interactIndicatorFilter.brightness(val + Math.PI / 3, false);
     this.filterCount += Manager.deltaTime();
   }

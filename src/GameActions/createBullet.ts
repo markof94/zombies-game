@@ -1,7 +1,7 @@
 import { Point } from "pixi.js";
 import { Bullet } from "../Entities/Bullet";
-import normalize from "../Utilities/Vector/normalize";
-import subtract from "../Utilities/Vector/subtract";
+import normalize from "../Utilities/Vector/Normalize";
+import subtract from "../Utilities/Vector/Subtract";
 
 const createBullet = (originPosition: any, targetPosition: any, data: any): Bullet => {
   const targetPoint = new Point(targetPosition.x, targetPosition.y);

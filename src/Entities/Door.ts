@@ -2,9 +2,9 @@ import { Point, Sprite, Texture } from "pixi.js";
 import { GameScene } from "../Scenes/GameScene";
 import { TAG_WALL, tileSize } from "../Utilities/constants";
 import { Entity } from "./Entity";
+import { getLoadedAsset } from "../Utilities/getLoadedAsset";
 
 export class Door extends Entity {
-  public sprite: Sprite;
   public isOpen: boolean = false;
   public textureOpen: Texture;
   public textureClosed: Texture;
@@ -13,8 +13,9 @@ export class Door extends Entity {
     super({ ...data, texture: 'doorClosed' });
     this.tag = TAG_WALL;
 
-    this.textureOpen = Texture.from('doorOpen');
-    this.textureClosed = Texture.from('doorClosed');
+    // Use our new asset loading system
+    this.textureOpen = getLoadedAsset('doorOpen') || new Texture();
+    this.textureClosed = getLoadedAsset('doorClosed') || new Texture();
     this.interactable = true;
   }
 

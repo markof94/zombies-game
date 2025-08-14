@@ -1,5 +1,5 @@
 import { Manager } from './Manager';
-import { LoaderScene } from './scenes/LoaderScene';
+import { LoaderScene } from './Scenes/LoaderScene';
 
 Manager.initialize(window.innerWidth, window.innerHeight, 0x6495ed);
 
